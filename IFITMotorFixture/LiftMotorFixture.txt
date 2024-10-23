@@ -1,0 +1,1 @@
+Designed a test fixture for incline trainer AC lift motor. This is the code that runs it.
