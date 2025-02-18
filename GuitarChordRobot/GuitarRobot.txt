@@ -1,0 +1,4 @@
+Me and my roomate Joseph have been working on this project for a month or two, and i'm starting to write more complex code to control the motors on our device.
+Our goal is to create a device that can play almost any chord on a guitar and be controllable by a user, allowing someone without the use of their left hand to play the guitar.
+Our current design uses small N20 geared motors with screws to create linear acutators all 3-D printed and held together by a fram that connects onto the guitar.
+Right now I am using small H-bridge motor controllers with an arduino to run the motors. At some point I might change to a different microcontroller.
