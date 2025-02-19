@@ -154,8 +154,18 @@ void setup() {
 
 void loop() {
   //Play chord on and off
-  PlayChord(G);
-  delay(5000);
+  //PlayChord(G);
+  //delay(5000);
   PlayChord(C);
+  delay(4000);
+  PlayChord(Cmaj7);
+  delay(4000);
+  PlayChord(Cadd9);
+  delay(4000);
+  PlayChord(Am);
+  delay(4000);
+  PlayChord(Amsus2);
+  delay(4000);
+  PlayChord(Amsus4);
   delay(4000);
 }
