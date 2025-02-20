@@ -15,17 +15,22 @@ struct Note{
   int motorTimeIn;
 };
 //Structs for every note (every motor spot)
-int numNotes = 9;
+int numNotes = 6;//9
+int defaultTimeOut = 40;//50;
+int defaultTimeIn = 100;
+int TimeIn = 120;
+int calibrationTimeIn = 80;
 Note Notes[] ={
-  {11, 1, 2, 120, 120},
-  {12, 3, 4},
-  {13, 5, 6},
-  {23, 7, 8},
-  {32, 9, 10},
-  {42, 11, 12},
-  {52, 13, 14},
-  {51, 15, 16},
-  {53, 17, 18}
+  //{11, 1, 2, 0, defaultTimeOut, defaultTimeIn},
+  //{12, 3, 4, 0, defaultTimeOut, defaultTimeIn},
+  //{13, 5, 6, 0, defaultTimeOut, defaultTimeIn},
+  {22, 3, 2, 0, defaultTimeOut, defaultTimeIn},
+  {23, 8, 9, 0, defaultTimeOut, defaultTimeIn},
+  {32, 1, 0, 0, defaultTimeOut, defaultTimeIn},
+  {42, 4, 5, 0, defaultTimeOut, defaultTimeIn},
+  //{52, 13, 14, 0, defaultTimeOut, defaultTimeIn},
+  {51, 6, 7, 0, defaultTimeOut, defaultTimeIn},
+  {53, 10, 11, 0, defaultTimeOut, defaultTimeIn}
 };
 //All Chords made of a list of notes
 int Open[] = {0};
@@ -82,9 +87,11 @@ void setup() {
 */
 
 //Functions for running any motor to play a note
-void NoteOn(Note note){
+void NoteOn(Note &note){
   //If note already on, don't run
-  if (note.on){}
+  if (note.on == 1){
+    return;
+  }
   else{
     //Run motor for time
     digitalWrite(note.pin1, HIGH);
@@ -92,29 +99,30 @@ void NoteOn(Note note){
     delay(note.motorTimeOut);
     digitalWrite(note.pin1, LOW);
     digitalWrite(note.pin2, LOW);
+    note.on = 1;
   }
 }
-void NoteOff(Note note){
-  //If note on
-  if (note.on){
+void NoteOff(Note &note){
+  //If note on, pull off
+  if (note.on == 1){
     //Run motor for time
     digitalWrite(note.pin1, LOW);
     digitalWrite(note.pin2, HIGH);
     delay(note.motorTimeIn);
     digitalWrite(note.pin1, LOW);
     digitalWrite(note.pin2, LOW);
+    note.on = 0;
   }
 }
 
-void PlayChord(int chord[]){
+void PlayChord(int chord[], int sizeChord){
   int inChord = 0;
-  int num = sizeof(chord);
   //Go through every note
   for (int i = 0; i < numNotes; i++) {
     //Turn off all except those in this chord
     inChord = 0;
     //Check if note in this chord
-    for (int n = num; n < numNotes; n++){
+    for (int n = 0; n < sizeChord; n++){
       if(Notes[i].name == chord[n]){
         inChord = 1;
       }
@@ -150,22 +158,32 @@ void setup() {
   //previousStrokeMillis = previousMillis;
 
   //Calibaration
+  for (int i = 0; i < numNotes; i++) {
+    //Run motor in for time
+    digitalWrite(Notes[i].pin1, LOW);
+    digitalWrite(Notes[i].pin2, HIGH);
+    delay(calibrationTimeIn);
+    digitalWrite(Notes[i].pin1, LOW);
+    digitalWrite(Notes[i].pin2, LOW);
+  }
+  delay(200);
 }
 
 void loop() {
   //Play chord on and off
   //PlayChord(G);
   //delay(5000);
-  PlayChord(C);
-  delay(4000);
-  PlayChord(Cmaj7);
-  delay(4000);
-  PlayChord(Cadd9);
-  delay(4000);
-  PlayChord(Am);
-  delay(4000);
-  PlayChord(Amsus2);
-  delay(4000);
-  PlayChord(Amsus4);
-  delay(4000);
+  int timeDelay = 3000;
+  PlayChord(C, (sizeof(C) / sizeof(C[0])));
+  delay(timeDelay);
+  PlayChord(Cmaj7, (sizeof(Cmaj7) / sizeof(Cmaj7[0])));
+  delay(timeDelay);
+  PlayChord(Cadd9, (sizeof(Cadd9) / sizeof(Cadd9[0])));
+  delay(timeDelay);
+  PlayChord(Am, (sizeof(Am) / sizeof(Am[0])));
+  delay(timeDelay);
+  PlayChord(Amsus2, (sizeof(Amsus2) / sizeof(Amsus2[0])));
+  delay(timeDelay);
+  PlayChord(Amsus4, (sizeof(Amsus4) / sizeof(Amsus4[0])));
+  delay(timeDelay);
 }
