@@ -16,20 +16,22 @@ struct Note{
 };
 //Structs for every note (every motor spot)
 int numNotes = 6;//9
-int defaultTimeOut = 40;//50;
-int defaultTimeIn = 100;
+int defaultTimeOut = 100;//50;
+int extraTimeOut = 150;
+int superTimeOut = 300;
+int defaultTimeIn = 120;
 int TimeIn = 120;
-int calibrationTimeIn = 80;
+int calibrationTimeIn = 120;
 Note Notes[] ={
   //{11, 1, 2, 0, defaultTimeOut, defaultTimeIn},
   //{12, 3, 4, 0, defaultTimeOut, defaultTimeIn},
   //{13, 5, 6, 0, defaultTimeOut, defaultTimeIn},
-  {22, 3, 2, 0, defaultTimeOut, defaultTimeIn},
-  {23, 8, 9, 0, defaultTimeOut, defaultTimeIn},
+  {22, 4, 5, 0, defaultTimeOut, defaultTimeIn},
+  {23, 8, 9, 0, superTimeOut, defaultTimeIn},
   {32, 1, 0, 0, defaultTimeOut, defaultTimeIn},
-  {42, 4, 5, 0, defaultTimeOut, defaultTimeIn},
+  {42, 3, 2, 0, defaultTimeOut, defaultTimeIn},
   //{52, 13, 14, 0, defaultTimeOut, defaultTimeIn},
-  {51, 6, 7, 0, defaultTimeOut, defaultTimeIn},
+  {51, 6, 7, 0, extraTimeOut, defaultTimeIn},
   {53, 10, 11, 0, defaultTimeOut, defaultTimeIn}
 };
 //All Chords made of a list of notes
@@ -166,7 +168,7 @@ void setup() {
     digitalWrite(Notes[i].pin1, LOW);
     digitalWrite(Notes[i].pin2, LOW);
   }
-  delay(200);
+  delay(10000);
 }
 
 void loop() {
@@ -180,10 +182,15 @@ void loop() {
   delay(timeDelay);
   PlayChord(Cadd9, (sizeof(Cadd9) / sizeof(Cadd9[0])));
   delay(timeDelay);
+
+  /*
+  PlayChord(Open, 0);
+  delay(timeDelay);
   PlayChord(Am, (sizeof(Am) / sizeof(Am[0])));
   delay(timeDelay);
   PlayChord(Amsus2, (sizeof(Amsus2) / sizeof(Amsus2[0])));
   delay(timeDelay);
   PlayChord(Amsus4, (sizeof(Amsus4) / sizeof(Amsus4[0])));
   delay(timeDelay);
+  */
 }
