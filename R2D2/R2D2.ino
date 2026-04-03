@@ -23,15 +23,16 @@ void setup() {
   playTrack(4);
   delay(4000);
 }
-
+int ch6Pos;
+int ch5Pos;
 void loop() {
   // Alternate reading CH5 and CH6
   chValues[currentChannel] = pulseIn(chPins[currentChannel], HIGH, 25000);
 
   // Map CH5 (2-pos) and CH6 (3-pos) to logical positions
-  int ch5Pos = (chValues[0] > 1500) ? 1 : 0; // 0=down, 1=up
-  int ch6Pos;
-  if (chValues[1] < 1250) ch6Pos = 0;        // down
+  ch5Pos = (chValues[0] > 1500) ? 1 : 0; // 0=down, 1=up
+  if (chValues[1] < 800) ch6Pos = ch6Pos;    //Stay the same when not reading correctly
+  else if (chValues[1] < 1250) ch6Pos = 0;   // down
   else if (chValues[1] > 1750) ch6Pos = 2;   // up
   else ch6Pos = 1;                           // middle
 
@@ -40,14 +41,15 @@ void loop() {
     // Encode sound: 0=down+down, 1=down+up, 2=up+down, 3=up+up
     //int soundIndex = (ch6Pos == 2 ? 2 : 0) + ch5Pos;
     if (ch6Pos == 0 && ch5Pos == 0){
-      playSound(35);//Try 17, 42/43, 57, 59, 87, 89, 90 are long screams
+      playSound(17);//Try 17, 42/43, 57, 59, 87, 89, 90 are long screams
     }else if(ch6Pos == 0 && ch5Pos == 1){
-      playSound(36);
+      playSound(42);
     }else if(ch6Pos == 2 && ch5Pos == 0){
       playSound(60);
     }else if(ch6Pos == 2 && ch5Pos == 1){
-      playSound(66);
+      playSound(89);
     }
+    delay(2000);
   }
   lastCh6Pos = ch6Pos;
 
