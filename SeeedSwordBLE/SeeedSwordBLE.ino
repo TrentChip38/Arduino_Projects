@@ -78,9 +78,9 @@ void setup() {
   Serial.println("Device name: SeeedSword");
   Serial.println("");
   
-  // Set up connection callbacks
-  // Use generic event callback (works across Bluefruit versions)
-  Bluefruit.setEventCallback(bluefruit_event_cb);
+  // Set up connection callbacks (Periph API matches library examples)
+  Bluefruit.Periph.setConnectCallback(onConnect);
+  Bluefruit.Periph.setDisconnectCallback(onDisconnect);
   // Also log advertising state changes
   Bluefruit.Advertising.setSlowCallback(adv_slow_cb);
   Bluefruit.Advertising.setStopCallback(adv_stop_cb);
@@ -93,6 +93,8 @@ void onConnect(uint16_t conn_handle) {
   BLEConnection *conn = Bluefruit.Connection(conn_handle);
   if (conn) {
     conn->getPeerName(central_name, sizeof(central_name));
+  } else {
+    Serial.print("Warning: Connection object not found for handle="); Serial.println(conn_handle);
   }
   Serial.print("Connected to: ");
   Serial.println(central_name[0] ? central_name : "central");
@@ -107,24 +109,7 @@ void onDisconnect(uint16_t conn_handle, uint8_t reason) {
 }
 
 // Generic Bluefruit event callback to catch connect/disconnect for different API versions
-void bluefruit_event_cb(ble_evt_t* evt) {
-  uint16_t conn_handle;
-  switch (evt->header.evt_id) {
-    case BLE_GAP_EVT_CONNECTED:
-      conn_handle = evt->evt.gap_evt.conn_handle;
-      onConnect(conn_handle);
-      break;
-    case BLE_GAP_EVT_DISCONNECTED:
-      conn_handle = evt->evt.gap_evt.conn_handle;
-      {
-        uint8_t reason = evt->evt.gap_evt.params.disconnected.reason;
-        onDisconnect(conn_handle, reason);
-      }
-      break;
-    default:
-      break;
-  }
-}
+// (Removed generic event callback; using Periph callbacks instead)
 
 // Advertising callbacks
 void adv_slow_cb(void) {
