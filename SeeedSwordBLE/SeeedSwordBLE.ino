@@ -47,12 +47,17 @@ void setup() {
 
   Bluefruit.setName("SeeedSword");
   Bluefruit.setTxPower(4); // increase transmit power for reliability
+  // Configure security to prefer Just Works pairing (no MITM), easing PC pairing
+  Bluefruit.Security.setIOCaps(false, false, false);
+  Bluefruit.Security.setMITM(false);
+  Bluefruit.Security.setSecuredCallback(connection_secured_cb);
   
   // Register connection callbacks early (before advertising)
   Bluefruit.Periph.setConnectCallback(onConnect);
   Bluefruit.Periph.setDisconnectCallback(onDisconnect);
 
-  // Set up UART service
+  // Set up UART service (allow open access)
+  bleuart.setPermission(SECMODE_OPEN, SECMODE_OPEN);
   bleuart.begin();
 
   // Configure advertising
@@ -74,8 +79,11 @@ void setup() {
   Serial.println("");
   
   // Set up connection callbacks
-  Bluefruit.Periph.setConnectCallback(onConnect);
-  Bluefruit.Periph.setDisconnectCallback(onDisconnect);
+  // Use generic event callback (works across Bluefruit versions)
+  Bluefruit.setEventCallback(bluefruit_event_cb);
+  // Also log advertising state changes
+  Bluefruit.Advertising.setSlowCallback(adv_slow_cb);
+  Bluefruit.Advertising.setStopCallback(adv_stop_cb);
 }
 
 // BLE Connection callback
@@ -96,6 +104,40 @@ void onDisconnect(uint16_t conn_handle, uint8_t reason) {
   Serial.print("Disconnected (handle="); Serial.print(conn_handle);
   Serial.print(") reason=0x"); Serial.println(reason, HEX);
   Serial.println("Waiting for new connection...");
+}
+
+// Generic Bluefruit event callback to catch connect/disconnect for different API versions
+void bluefruit_event_cb(ble_evt_t* evt) {
+  uint16_t conn_handle;
+  switch (evt->header.evt_id) {
+    case BLE_GAP_EVT_CONNECTED:
+      conn_handle = evt->evt.gap_evt.conn_handle;
+      onConnect(conn_handle);
+      break;
+    case BLE_GAP_EVT_DISCONNECTED:
+      conn_handle = evt->evt.gap_evt.conn_handle;
+      {
+        uint8_t reason = evt->evt.gap_evt.params.disconnected.reason;
+        onDisconnect(conn_handle, reason);
+      }
+      break;
+    default:
+      break;
+  }
+}
+
+// Advertising callbacks
+void adv_slow_cb(void) {
+  Serial.println("Advertising switched to slow interval");
+}
+
+void adv_stop_cb(void) {
+  Serial.println("Advertising stopped");
+}
+
+// Called when a connection becomes secured (encrypted)
+void connection_secured_cb(uint16_t conn_handle) {
+  Serial.print("Connection secured (handle="); Serial.print(conn_handle); Serial.println(")");
 }
 
 void loop() {
