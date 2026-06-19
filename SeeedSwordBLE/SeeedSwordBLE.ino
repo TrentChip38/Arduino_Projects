@@ -54,16 +54,20 @@ void setup() {
   Serial.println("");
   
   // Set up connection callbacks
-  Bluefruit.Connection.setEventCallback(onConnect, onDisconnect);
+  Bluefruit.Periph.setConnectCallback(onConnect);
+  Bluefruit.Periph.setDisconnectCallback(onDisconnect);
 }
 
 // BLE Connection callback
 void onConnect(uint16_t conn_handle) {
   isConnected = true;
   char central_name[32] = {0};
-  Bluefruit.Connection.getPeerName(conn_handle, central_name, sizeof(central_name) - 1);
+  BLEConnection *conn = Bluefruit.Connection(conn_handle);
+  if (conn) {
+    conn->getPeerName(central_name, sizeof(central_name));
+  }
   Serial.print("Connected to: ");
-  Serial.println(central_name);
+  Serial.println(central_name[0] ? central_name : "central");
 }
 
 // BLE Disconnection callback
