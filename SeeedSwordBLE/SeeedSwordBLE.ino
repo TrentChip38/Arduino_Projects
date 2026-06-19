@@ -16,6 +16,9 @@ const int delayMs = 1000 / sampleRateHz;  // ~20ms for 50Hz
 
 // Connection tracking
 bool isConnected = false;
+// Status printing
+unsigned long lastStatusMillis = 0;
+const unsigned long statusIntervalMs = 2000;
 
 void setup() {
   Serial.begin(115200);
@@ -34,7 +37,14 @@ void setup() {
 
   // Set up BLE
   Serial.println("Initializing Bluetooth...");
-  Bluefruit.begin();
+  if (!Bluefruit.begin()) {
+    Serial.println("ERROR: Bluefruit.begin() failed!");
+    while (1) {
+      delay(1000);
+    }
+  }
+  Serial.println("Bluefruit.begin() OK");
+
   Bluefruit.setName("SeeedSword");
   Bluefruit.setTxPower(4); // increase transmit power for reliability
   
@@ -55,6 +65,8 @@ void setup() {
   Bluefruit.Advertising.setFastTimeout(30);
 
   Bluefruit.Advertising.start(0);  // Advertise forever
+  Serial.print("Advertising running: ");
+  Serial.println(Bluefruit.Advertising.isRunning() ? "yes" : "no");
   
   Serial.println("BLE Advertising started!");
   Serial.println("Looking for connection...");
@@ -87,6 +99,18 @@ void onDisconnect(uint16_t conn_handle, uint8_t reason) {
 }
 
 void loop() {
+  unsigned long now = millis();
+  if (now - lastStatusMillis >= statusIntervalMs) {
+    lastStatusMillis = now;
+    Serial.print("Status: connected_count=");
+    Serial.print(Bluefruit.connected());
+    Serial.print("  AdvRunning=");
+    Serial.println(Bluefruit.Advertising.isRunning() ? "yes" : "no");
+    if (!isConnected) {
+      Serial.print("BLEUart available bytes=");
+      Serial.println(bleuart.available());
+    }
+  }
   if (isConnected) {
     // Read IMU data
     float ax = imu.readFloatAccelX();
