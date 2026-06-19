@@ -45,7 +45,10 @@ void setup() {
   Bluefruit.Advertising.addTxPower();
   Bluefruit.Advertising.addService(bleuart);
   Bluefruit.ScanResponse.addName();
-  
+  Bluefruit.Advertising.restartOnDisconnect(true);
+  Bluefruit.Advertising.setInterval(32, 244);  // 20ms fast, 152.5ms slow
+  Bluefruit.Advertising.setFastTimeout(30);
+
   Bluefruit.Advertising.start(0);  // Advertise forever
   
   Serial.println("BLE Advertising started!");
