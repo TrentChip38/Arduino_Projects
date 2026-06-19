@@ -36,7 +36,12 @@ void setup() {
   Serial.println("Initializing Bluetooth...");
   Bluefruit.begin();
   Bluefruit.setName("SeeedSword");
+  Bluefruit.setTxPower(4); // increase transmit power for reliability
   
+  // Register connection callbacks early (before advertising)
+  Bluefruit.Periph.setConnectCallback(onConnect);
+  Bluefruit.Periph.setDisconnectCallback(onDisconnect);
+
   // Set up UART service
   bleuart.begin();
 
@@ -76,7 +81,8 @@ void onConnect(uint16_t conn_handle) {
 // BLE Disconnection callback
 void onDisconnect(uint16_t conn_handle, uint8_t reason) {
   isConnected = false;
-  Serial.println("Disconnected");
+  Serial.print("Disconnected (handle="); Serial.print(conn_handle);
+  Serial.print(") reason=0x"); Serial.println(reason, HEX);
   Serial.println("Waiting for new connection...");
 }
 
